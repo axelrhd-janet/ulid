@@ -32,3 +32,16 @@
   Pass :local as second argument for local time, default is UTC."
   [id &opt local]
   (os/date (-> id timestamp (/ 1000) math/floor) local))
+
+(defn valid?
+  "Returns true if id is a syntactically valid ULID string.
+  Checks length, Crockford base32 alphabet (case-insensitive), and that the
+  encoded timestamp fits in 48 bits (i.e. the first character is 0-7)."
+  [id]
+  (and (string? id)
+       (= (length id) 26)
+       (let [upper (string/ascii-upper id)
+             first-val (string/find (string/from-bytes (get upper 0)) crockford)]
+         (and first-val
+              (< first-val 8)
+              (all |(string/find (string/from-bytes $) crockford) upper)))))

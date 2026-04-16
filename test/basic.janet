@@ -44,3 +44,23 @@
       d (date id :local)
       now (os/date (os/time) :local)]
   (assert (= (d :year) (now :year)) "local date year mismatch"))
+
+# `valid?` accepts freshly generated ULIDs.
+(assert (valid? (new)) "a freshly generated ULID should be valid")
+
+# `valid?` is case-insensitive (Crockford base32 per spec).
+(assert (valid? (string/ascii-lower (new)))
+        "lowercase ULIDs should be valid")
+
+# `valid?` rejects malformed inputs.
+(assert (not (valid? nil)) "nil is not a valid ULID")
+(assert (not (valid? 42)) "a number is not a valid ULID")
+(assert (not (valid? "")) "empty string is not a valid ULID")
+(assert (not (valid? (string/slice (new) 0 25)))
+        "25-character strings are not valid ULIDs")
+(assert (not (valid? (string (new) "X")))
+        "27-character strings are not valid ULIDs")
+(assert (not (valid? "IL0000000000000000000000000"))
+        "strings with non-Crockford characters are not valid ULIDs")
+(assert (not (valid? "80000000000000000000000000"))
+        "timestamps that overflow 48 bits are not valid ULIDs")

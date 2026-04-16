@@ -40,6 +40,11 @@ jpm install https://github.com/axelrhd-janet/ulid.git
 
 (ulid/date "01JS8TAX5P7K3H2B4N9QWERTYZ" :local)
 # => same struct, but in local time
+
+(ulid/valid? "01JS8TAX5P7K3H2B4N9QWERTYZ")
+# => true
+(ulid/valid? "not-a-ulid")
+# => false
 ```
 
 ## API
@@ -58,6 +63,12 @@ milliseconds since the Unix epoch.
 Returns the ULID's creation time as an `os/date` struct. Pass `:local` as
 the second argument for local time; defaults to UTC. The sub-second
 portion of the timestamp is discarded — `os/date` has second resolution.
+
+### `(ulid/valid? id)`
+
+Returns true if `id` is a syntactically valid ULID string: exactly 26
+characters from the Crockford base32 alphabet (case-insensitive), with
+the encoded timestamp fitting in 48 bits (first character 0–7).
 
 ## Notes
 
